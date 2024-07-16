@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="platform" params="id platform_radius platform_height platform_material_rgba parent origin_xyz origin_rpy">
+
+    <link name="${id}">
+      <visual>
+        <geometry>
+          <cylinder radius="${platform_radius}" length="${platform_height}"/>
+        </geometry>
+        <material name="${id}_material">
+          <color rgba="${platform_material_rgba}"/>
+        </material>
+      </visual>
+    </link>
+
+    <!-- Шарнир соединяющий платформу с базой (возможно условно, если требуется для структуры URDF) -->
+    <joint name="${id}_base_joint" type="fixed">
+      <origin xyz="${origin_xyz}" rpy="${origin_rpy}"/>
+      <parent link="${parent}"/>
+      <child link="${id}"/>
+    </joint>
+  </xacro:macro>
+
+</robot>

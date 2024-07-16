@@ -1,0 +1,15 @@
+name: ros_2_hamble
+
+services:
+  ros-hamble-master:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    working_dir: /workspace   
+    # mem_limit: 4G  # выделение до 4 гигабайт памяти
+    # cpus: 2.0  # ограничение до двух процессорных ядер     
+    volumes:
+      - ../src:/workspace/src/    
+    env_file:
+      - ./.env
+    tty: true

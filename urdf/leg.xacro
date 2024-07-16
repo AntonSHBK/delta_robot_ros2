@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+<!-- *********************************************************************** -->
+  <!-- Simple transmission -->
+  <xacro:macro name="simple_transmission" params="joint_name">
+      <transmission name="${joint_name}_transmission">
+          <type>transmission_interface/SimpleTransmission</type>
+          <joint name="${joint_name}">
+            <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+          </joint>
+          <actuator name="${joint_name}_actuator">
+            <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+          </actuator>
+        </transmission>
+  </xacro:macro>
+
+  <xacro:macro name="leg" params="prefix origin_xyz origin_rpy">
+  
+    <!-- Параметры для шарнира, соединяющего основание и первое звено -->
+    <joint name="${prefix}_joint_1" type="revolute">
+      <origin xyz="${origin_xyz}" rpy="${origin_rpy}" />
+      <parent link="base_link"/>
+      <child link="${prefix}_link_1"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-${pi / 2}" upper="${pi / 2}" effort="1000" velocity="3"/>
+    </joint>
+
+    <xacro:simple_transmission joint_name="${prefix}_joint_1"/>
+
+<!-- *********************************************************************** -->
+
+    <!-- Первое звено -->
+    <link name="${prefix}_link_1">
+      <visual>
+        <geometry>
+          <cylinder length="0.4" radius="0.05"/>
+        </geometry>
+         <material name="material_link_1">
+          <color rgba="0 0 1 1"/>
+        </material>
+      </visual>
+    </link>
+
+<!-- *********************************************************************** -->
+
+    <!-- Сферический шарнир между первым и вторым звеном -->
+    <!-- <joint name="${prefix}_joint_2_x" type="revolute">
+      <origin xyz="0 0 0.2" rpy="0 0 0"/>
+      <parent link="${prefix}_link_1"/>
+      <child link="${prefix}_link_ball_1_1"/>
+      <axis xyz="1 0 0"/>
+      <limit lower="-3.14" upper="3.14" effort="1000" velocity="3"/>
+    </joint>
+
+    <xacro:simple_transmission joint_name="${prefix}_joint_2_x"/>
+
+    <link name="${prefix}_link_ball_1_1">
+      <visual>
+        <geometry>
+          <sphere radius="0.01"/>
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="${prefix}_joint_2_y" type="revolute">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="${prefix}_link_ball_1_1"/>
+      <child link="${prefix}_link_ball_1_2"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-3.14" upper="3.14" effort="1000" velocity="3"/>
+    </joint>
+
+    <xacro:simple_transmission joint_name="${prefix}_joint_2_y"/>
+
+    <link name="${prefix}_link_ball_1_2">
+      <visual>
+        <geometry>
+          <sphere radius="0.01"/>
+        </geometry>
+      </visual>
+    </link>
+
+    <xacro:simple_transmission joint_name="${prefix}_joint_2_z"/>
+
+    <joint name="${prefix}_joint_2_z" type="revolute">
+      <origin xyz="0 0 0.15" rpy="0 0 0"/>
+      <parent link="${prefix}_link_ball_1_2"/>
+      <child link="${prefix}_link_2"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="-3.14" upper="3.14" effort="1000" velocity="3"/>
+    </joint> -->
+
+<!-- *********************************************************************** -->
+
+    <!-- Второе звено -->
+    <!-- <link name="${prefix}_link_2">
+      <visual>
+        <geometry>
+          <cylinder length="0.3" radius="0.05"/>
+        </geometry>
+        <material name="material_link_2">
+          <color rgba="1 0 0 1"/>
+        </material>
+      </visual>
+    </link> -->
+
+<!-- *********************************************************************** -->
+
+    <!-- Сферический шарнир, соединяющий второе звено с манипулируемой платформой -->
+
+     <!-- <joint name="${prefix}_joint_3_x" type="revolute">
+      <origin xyz="0 0 0.15" rpy="0 0 0"/>
+      <parent link="${prefix}_link_2"/>
+      <child link="${prefix}_link_ball_2_1"/>
+      <axis xyz="1 0 0"/>
+      <limit lower="-3.14" upper="3.14" effort="1000" velocity="3"/>
+    </joint>
+
+    <link name="${prefix}_link_ball_2_1">
+      <visual>
+        <geometry>
+          <sphere radius="0.01"/>
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="${prefix}_joint_3_y" type="revolute">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="${prefix}_link_ball_2_1"/>
+      <child link="${prefix}_link_ball_2_2"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="-3.14" upper="3.14" effort="1000" velocity="3"/>
+    </joint>
+
+    <link name="${prefix}_link_ball_2_2">
+      <visual>
+        <geometry>
+          <sphere radius="0.01"/>
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="${prefix}_joint_3_z" type="revolute">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="${prefix}_link_ball_2_2"/>
+      <child link="platform"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="-3.14" upper="3.14" effort="1000" velocity="3"/>
+    </joint> -->
+
+<!-- *********************************************************************** -->
+
+  </xacro:macro>
+
+</robot>

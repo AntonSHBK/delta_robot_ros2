@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="base" params="id base_radius base_height base_material_rgba">
+  
+    <link name="GSC">
+    </link>
+    
+    <!-- Чтобы перевернуть систему исменить rpy (${pi} 0 0) -->
+    <joint name="GSC_to_base" type="fixed">
+      <parent link="GSC"/>
+      <child link="${id}_link"/>
+      <origin xyz="0 0 0" rpy="${0} 0 0"/>
+    </joint>
+
+    <link name="${id}_link">
+      <visual>
+        <geometry>
+          <cylinder length="${base_height}" radius="${base_radius}"/>
+        </geometry>
+        <material name="${id}_material">
+          <color rgba="${base_material_rgba}"/>
+        </material>
+      </visual>
+    </link>
+  </xacro:macro>
+
+</robot>
