@@ -88,6 +88,17 @@ def generate_launch_description():
     # controllers_config = LaunchConfiguration("controllers_config")
     gui = LaunchConfiguration("gui")
     
+     # gazebo
+    gazebo = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
+        )
+    )
+    
+    launch_description = [
+        gazebo
+    ]
+    
     # Nodes
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
@@ -124,27 +135,27 @@ def generate_launch_description():
         ],
     )
     
-    # joint_state_broadcaster_node = Node(
-    #     package='controller_manager',
-    #     executable='spawner',
-    #     name='joint_state_broadcaster_spawner',
-    #     namespace=robot_namespace,  # Добавление пространства имен
-    #     output='screen',
-    #     arguments=['joint_state_broadcaster', '--controller-manager', 
-    #                 f'/{robot_namespace}/controller_manager',
-    #                 ],
-    # )
+    joint_state_broadcaster_node = Node(
+        package='controller_manager',
+        executable='spawner',
+        name='joint_state_broadcaster_spawner',
+        namespace=robot_namespace,  # Добавление пространства имен
+        output='screen',
+        arguments=['joint_state_broadcaster', '--controller-manager', 
+                    f'/{robot_namespace}/controller_manager',
+                    ],
+    )
     
-    # robot_controller_node = Node(
-    #     package='controller_manager',
-    #     executable='spawner',
-    #     name='position_controllers_spawner',
-    #     namespace=robot_namespace,  # Добавление пространства имен
-    #     output='screen',
-    #     arguments=['position_controllers', '--controller-manager',  
-    #                f'/{robot_namespace}/controller_manager',
-    #                ],
-    # )
+    robot_controller_node = Node(
+        package='controller_manager',
+        executable='spawner',
+        name='position_controllers_spawner',
+        namespace=robot_namespace,  # Добавление пространства имен
+        output='screen',
+        arguments=['position_controllers', '--controller-manager',  
+                   f'/{robot_namespace}/controller_manager',
+                   ],
+    )
 
     # Нода управления
     # delta_control_node = Node(
@@ -166,64 +177,57 @@ def generate_launch_description():
         condition=IfCondition(gui),
     )
     
-    # # gazebo
-    # gazebo = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
-    #     )
-    # )
+    gz_node = Node(
+        package="ros_gz_sim",
+        executable="create",
+        output="screen",
+        arguments=[
+            "-topic", f"/{robot_namespace}/robot_description",
+            "-name", "delta_robot",
+        ],
+    )
     
-    # gz_node = Node(
-    #     package="ros_gz_sim",
-    #     executable="create",
-    #     output="screen",
-    #     arguments=[
-    #         "-topic", f"/{robot_namespace}/robot_description",
-    #         "-name", "delta_robot",
-    #     ],
-    # )
+    # Delay rviz start after `joint_state_broadcaster`
+    delay_rviz_after_joint_state_broadcaster_node = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=joint_state_broadcaster_node,
+            on_exit=[rviz_node],
+        )
+    )
+
+    # Delay start of robot_controller after `joint_state_broadcaster`
+    delay_robot_controller_node_after_joint_state_broadcaster_node = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=joint_state_broadcaster_node,
+            on_exit=[robot_controller_node],
+        )
+    )
+
+    delay_gz_node_after_joint_state_broadcaster_node = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=joint_state_broadcaster_node,
+            on_exit=[gz_node],
+        )
+    )
     
-    # # Delay rviz start after `joint_state_broadcaster`
-    # delay_rviz_after_joint_state_broadcaster_node = RegisterEventHandler(
-    #     event_handler=OnProcessExit(
-    #         target_action=joint_state_broadcaster_node,
-    #         on_exit=[rviz_node],
-    #     )
-    # )
-
-    # # Delay start of robot_controller after `joint_state_broadcaster`
-    # delay_robot_controller_node_after_joint_state_broadcaster_node = RegisterEventHandler(
-    #     event_handler=OnProcessExit(
-    #         target_action=joint_state_broadcaster_node,
-    #         on_exit=[robot_controller_node],
-    #     )
-    # )
-
-    # delay_gz_node_after_joint_state_broadcaster_node = RegisterEventHandler(
-    #     event_handler=OnProcessExit(
-    #         target_action=joint_state_broadcaster_node,
-    #         on_exit=[gz_node],
-    #     )
-    # )
+    nodes = [
+        robot_state_publisher_node,
+        joint_state_publisher_node,
+        ros2_control_node,
+        joint_state_broadcaster_node,
+        delay_rviz_after_joint_state_broadcaster_node,
+        delay_robot_controller_node_after_joint_state_broadcaster_node,
+        delay_gz_node_after_joint_state_broadcaster_node
+    ]   
     
     # nodes = [
     #     robot_state_publisher_node,
     #     ros2_control_node,
-    #     joint_state_broadcaster_node,
-    #     delay_rviz_after_joint_state_broadcaster_node,
-    #     delay_robot_controller_node_after_joint_state_broadcaster_node,
-    #     delay_gz_node_after_joint_state_broadcaster_node``
-    # ]   
-    
-    nodes = [
-        robot_state_publisher_node,
-        ros2_control_node,
-        joint_state_publisher_node,
-        # joint_state_broadcaster_node,
-        # robot_controller_node,
-        rviz_node,
-        # gazebo,
-        # gz_node
-    ] 
+    #     joint_state_publisher_node,
+    #     # joint_state_broadcaster_node,
+    #     # robot_controller_node,
+    #     rviz_node,
+    #     gz_node
+    # ]
 
-    return LaunchDescription(declared_arguments + nodes)
+    return LaunchDescription(declared_arguments + launch_description + nodes)

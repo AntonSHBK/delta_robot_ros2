@@ -51,11 +51,12 @@ RUN apt-get update && apt-get install -y \
     ros-humble-realtime-tools \
     ros-humble-rqt-controller-manager \
     ros-humble-ros-gz \
+    ros-humble-ign-ros2-control \
     ros-humble-xacro \
     ros-humble-moveit \
     && rm -rf /var/lib/apt/lists/*
 
-RUN echo "source /usr/share/ignition/fortress/setup.sh" >> ~/.bashrc
+# RUN echo "source /usr/share/ignition/fortress/setup.sh" >> ~/.bashrc
 
 # **************************************************************************** #
 
@@ -80,7 +81,7 @@ RUN mkdir -p $WORKSPACE
 WORKDIR $WORKSPACE
 
 # copy project
-COPY . $WORKSPACE
+COPY . $WORKSPACE/delta_robot_ros2
 
 # **************************************************************************** #
 

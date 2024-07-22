@@ -31,24 +31,6 @@
 
     <xacro:simple_transmission joint_name="${prefix}_joint_1"/>
 
-    <!-- <ros2_control name="${prefix}_control" type="actuator">
-      <hardware>
-        <plugin>ros2_control_demo_hardware/GenericActuator</plugin>
-      </hardware>
-      <joint_state_broadcaster>
-        <plugin>joint_state_broadcaster/JointStateBroadcaster</plugin>
-        <joint>
-          <name>${prefix}_joint_1</name>
-        </joint>
-      </joint_state_broadcaster>
-      <controller>
-        <plugin>position_controllers/JointPositionController</plugin>
-        <joint>
-          <name>${prefix}_joint_1</name>
-        </joint>
-      </controller>
-    </ros2_control> -->
-
 <!-- *********************************************************************** -->
 
     <!-- Первое звено -->

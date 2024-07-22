@@ -1,7 +1,7 @@
-name: ros_2_hamble
+name: delta_robot_ros2
 
 services:
-  ros-hamble-master:
+  ros-hamble-delta:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile
@@ -9,7 +9,7 @@ services:
     # mem_limit: 4G  # выделение до 4 гигабайт памяти
     # cpus: 2.0  # ограничение до двух процессорных ядер     
     volumes:
-      - ../src:/workspace/src/    
+      - ../:/workspace/src/delta_robot_ros2 
     env_file:
       - ./.env
     tty: true
