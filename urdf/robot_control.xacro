@@ -14,7 +14,7 @@
     <!-- ros2_control -->
     <ros2_control name="IgnitionSystem" type="system">
         <hardware>
-        <plugin>ign_ros2_control/IgnitionSystem</plugin>
+        <plugin>mock_components/GenericSystem</plugin>
         </hardware>
         <joint name="leg_1_joint_1">
             <command_interface name="position">

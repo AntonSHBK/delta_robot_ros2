@@ -22,18 +22,7 @@ def generate_launch_description():
     pkg_share = get_package_share_directory(pkg_name)
     
     # Пространство имён
-    robot_namespace = 'delta_robot'
-    
-
-    # # Путь к файлу .xacro
-    # urdf_file = os.path.join(pkg_share, 'urdf', 'delta_robot.xacro')    
-    
-    # # Путь к файлу конфигурации RViz
-    # rviz_config_file = os.path.join(pkg_share, 'rviz', 'base.rviz')
-    # # Путь к файлу конфигурации контроллеров
-    # controllers_yaml = os.path.join(pkg_share, 'config', 'delta_robot_controllers.yml')
-    
-    
+    robot_namespace = 'delta_robot'   
     
     # Get URDF via xacro
     robot_description_content = Command(
@@ -83,9 +72,6 @@ def generate_launch_description():
     )
     
     # Initialize Arguments
-    # use_sim_time = LaunchConfiguration("use_sim_time")
-    # robot_description = LaunchConfiguration("robot_description")
-    # controllers_config = LaunchConfiguration("controllers_config")
     gui = LaunchConfiguration("gui")
     
      # gazebo
@@ -105,7 +91,7 @@ def generate_launch_description():
         executable='robot_state_publisher',
         name='robot_state_publisher',
         namespace=robot_namespace,  # Добавление пространства имен
-        output='screen',
+        output='both',
         parameters=[robot_description]
     )
     
@@ -115,56 +101,43 @@ def generate_launch_description():
         executable='joint_state_publisher',
         name='joint_state_publisher',
         namespace=robot_namespace,  # Добавление пространства имен
-        output='screen'
+        output='both'
     )
 
     # Контроллеры
     ros2_control_node = Node(
         package='controller_manager',
         executable='ros2_control_node',
-        name='ros2_control_node',
-        namespace=robot_namespace,  # Добавление пространства имен
-        output='screen',
-        parameters=[
-            robot_controllers,
-            {
-                
-            }],
+        # name='ros2_control_node',
+        # namespace=robot_namespace,  # Добавление пространства имен
+        output='both',
+        parameters=[robot_controllers],
         remappings=[
-            ("~/robot_description", "/robot_description"),
+            ("~/robot_description", f"/{robot_namespace}/robot_description"),
         ],
     )
     
     joint_state_broadcaster_node = Node(
         package='controller_manager',
         executable='spawner',
-        name='joint_state_broadcaster_spawner',
-        namespace=robot_namespace,  # Добавление пространства имен
-        output='screen',
+        # name='joint_state_broadcaster_spawner',
+        # namespace=robot_namespace,  # Добавление пространства имен
+        output='both',
         arguments=['joint_state_broadcaster', '--controller-manager', 
-                    f'/{robot_namespace}/controller_manager',
+                    f'/controller_manager',
                     ],
     )
     
     robot_controller_node = Node(
         package='controller_manager',
         executable='spawner',
-        name='position_controllers_spawner',
-        namespace=robot_namespace,  # Добавление пространства имен
-        output='screen',
-        arguments=['position_controllers', '--controller-manager',  
-                   f'/{robot_namespace}/controller_manager',
+        # name='position_controllers_spawner',
+        # namespace=robot_namespace,  # Добавление пространства имен
+        output='both',
+        arguments=['forward_position_controller', '--controller-manager',  
+                   f'/controller_manager',
                    ],
     )
-
-    # Нода управления
-    # delta_control_node = Node(
-    #     package='delta_robot_ros2',
-    #     executable='delta_robot_controller.py',
-    #     name='delta_robot_controller',
-    #     namespace=robot_namespace,
-    #     output='screen'
-    # ),
 
     # RViz запускается в том же пространстве имен
     rviz_node = Node(
@@ -182,7 +155,7 @@ def generate_launch_description():
         executable="create",
         output="screen",
         arguments=[
-            "-topic", f"/{robot_namespace}/robot_description",
+            "-topic", f"/robot_description",
             "-name", "delta_robot",
         ],
     )
@@ -212,22 +185,12 @@ def generate_launch_description():
     
     nodes = [
         robot_state_publisher_node,
-        joint_state_publisher_node,
+        # joint_state_publisher_node,
         ros2_control_node,
         joint_state_broadcaster_node,
         delay_rviz_after_joint_state_broadcaster_node,
         delay_robot_controller_node_after_joint_state_broadcaster_node,
         delay_gz_node_after_joint_state_broadcaster_node
     ]   
-    
-    # nodes = [
-    #     robot_state_publisher_node,
-    #     ros2_control_node,
-    #     joint_state_publisher_node,
-    #     # joint_state_broadcaster_node,
-    #     # robot_controller_node,
-    #     rviz_node,
-    #     gz_node
-    # ]
 
     return LaunchDescription(declared_arguments + launch_description + nodes)
