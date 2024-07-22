@@ -1,0 +1,29 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 50  # Частота обновления контроллеров
+
+    # joint_state_broadcaster:
+    #   type: joint_state_broadcaster/JointStateBroadcaster
+
+    # joint_position_controller:
+    #   type: position_controllers/JointPositionController
+
+joint_position_controller:
+  ros__parameters:
+    joints:
+      - leg_1_joint_1
+      - leg_2_joint_1
+      - leg_3_joint_1
+    # pid:
+    #   leg_1_joint_1:
+    #     p: 100.0
+    #     i: 0.01
+    #     d: 10.0
+    #   leg_2_joint_1:
+    #     p: 100.0
+    #     i: 0.01
+    #     d: 10.0
+    #   leg_3_joint_1:
+    #     p: 100.0
+    #     i: 0.01
+    #     d: 10.0

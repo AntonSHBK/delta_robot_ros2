@@ -6,16 +6,17 @@
   <xacro:include filename="$(find delta_robot_ros2)/urdf/base.xacro"/>
   <xacro:include filename="$(find delta_robot_ros2)/urdf/leg.xacro"/>
   <xacro:include filename="$(find delta_robot_ros2)/urdf/platform.xacro"/>
+  <xacro:include filename="$(find delta_robot_ros2)/urdf/robot_control.xacro"/>
 
 <!-- *********************************************************************** -->
   <!-- Параметры для основания и платформы -->
   <xacro:property name="base_radius" value="0.5"/>
-  <xacro:property name="base_height" value="0.1"/>
-  <xacro:property name="base_material_rgba" value="0.5 0.5 0.5 1"/>
+  <xacro:property name="base_height" value="0.05"/>
+  <xacro:property name="base_material_rgba" value="1 0 0 0.8"/>
 
   <xacro:property name="platform_radius" value="0.3"/>
-  <xacro:property name="platform_height" value="0.1"/>
-  <xacro:property name="platform_material_rgba" value="0.7 0.7 0.7 1"/>
+  <xacro:property name="platform_height" value="0.05"/>
+  <xacro:property name="platform_material_rgba" value="0 1 0 0.8"/>
 
   <xacro:property name="platform_initial_height" value="0.6"/>
 
@@ -51,5 +52,7 @@
   <xacro:leg prefix="leg_2" origin_xyz="${leg_2_origin_xyz}" origin_rpy="${leg_2_origin_rpy}"/>
   <xacro:leg prefix="leg_3" origin_xyz="${leg_3_origin_xyz}" origin_rpy="${leg_3_origin_rpy}"/>
 <!-- *********************************************************************** -->
+
+  <xacro:daleta_robot_control/>  
 
 </robot>

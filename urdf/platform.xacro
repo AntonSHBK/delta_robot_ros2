@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
+  <xacro:include filename="$(find delta_robot_ros2)/urdf/common_macro.xacro"/>
+
   <xacro:macro name="platform" params="id platform_radius platform_height platform_material_rgba parent origin_xyz origin_rpy">
 
     <link name="${id}">
@@ -12,6 +14,7 @@
           <color rgba="${platform_material_rgba}"/>
         </material>
       </visual>
+      <xacro:inertial_cylinder mass="1" length="${platform_height}" radius="${platform_radius}"/>
     </link>
 
     <!-- Шарнир соединяющий платформу с базой (возможно условно, если требуется для структуры URDF) -->

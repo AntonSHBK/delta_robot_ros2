@@ -1,9 +1,12 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
+  <xacro:include filename="$(find delta_robot_ros2)/urdf/common_macro.xacro"/>
+
   <xacro:macro name="base" params="id base_radius base_height base_material_rgba">
   
     <link name="GSC">
+      <xacro:inertial_cylinder mass="0.1" length="${1}" radius="${1}"/>
     </link>
     
     <!-- Чтобы перевернуть систему исменить rpy (${pi} 0 0) -->
@@ -22,6 +25,7 @@
           <color rgba="${base_material_rgba}"/>
         </material>
       </visual>
+      <xacro:inertial_cylinder mass="1" length="${base_height}" radius="${base_radius}"/>
     </link>
   </xacro:macro>
 

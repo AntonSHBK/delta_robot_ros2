@@ -49,6 +49,7 @@ RUN apt-get update && apt-get install -y \
     ros-humble-ros2-controllers \
     ros-humble-control-toolbox \
     ros-humble-realtime-tools \
+    ros-humble-rqt-controller-manager \
     ros-humble-ros-gz \
     ros-humble-xacro \
     ros-humble-moveit \

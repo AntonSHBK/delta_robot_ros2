@@ -33,6 +33,27 @@
   <depend>tf2_ros</depend>
   <depend>tf2_geometry_msgs</depend>
   <depend>visualization_msgs</depend>
+
+
+  <depend>hardware_interface</depend>
+  <!-- <depend>pluginlib</depend>
+  <depend>rclcpp_lifecycle</depend> -->
+
+  <exec_depend>controller_manager</exec_depend>
+  <!-- <exec_depend>forward_command_controller</exec_depend> -->
+  <exec_depend>joint_state_broadcaster</exec_depend>
+  <exec_depend>joint_state_publisher_gui</exec_depend>
+  <!-- <exec_depend>joint_trajectory_controller</exec_depend> -->
+  <!-- <exec_depend>ros2_controllers_test_nodes</exec_depend> -->
+  <!-- <exec_depend>ros2controlcli</exec_depend> -->
+  
+  <exec_depend>joint_state_publisher</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>ros2_control</exec_depend>
+  <exec_depend>ros2_controllers</exec_depend>
+  <exec_depend>ros_gz</exec_depend>
+  <exec_depend>gz_ros2_control</exec_depend>
+
 <!-- *********************************************************************** -->
 
   <!-- <test_depend>ament_lint_auto</test_depend>
