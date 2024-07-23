@@ -56,6 +56,7 @@ endforeach()
 install(PROGRAMS
   scripts/delta_robot_controller.py
   scripts/kinematic.py
+  scripts/dinamic_tf.py
   scripts/user_gui.py
   scripts/camera.py
   DESTINATION lib/${PROJECT_NAME}

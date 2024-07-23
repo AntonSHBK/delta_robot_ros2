@@ -26,18 +26,20 @@
       <parent link="base_link"/>
       <child link="${prefix}_link_1"/>
       <axis xyz="0 1 0"/>
-      <limit lower="-${pi / 2}" upper="${pi / 2}" effort="1000" velocity="3"/>
+      <limit lower="-${pi / 3}" upper="${pi / 3}" effort="1000" velocity="3"/>
     </joint>
 
     <xacro:simple_transmission joint_name="${prefix}_joint_1"/>
 
 <!-- *********************************************************************** -->
+    <xacro:property name="leg_length" value="0.4"/>
 
     <!-- Первое звено -->
     <link name="${prefix}_link_1">
       <visual>
+        <origin xyz="0 0 ${leg_length / 2}"/>
         <geometry>
-          <cylinder length="0.4" radius="0.05"/>
+          <cylinder length="${leg_length}" radius="0.05"/>
         </geometry>
          <material name="material_link_1">
           <color rgba="0 0 1 1"/>

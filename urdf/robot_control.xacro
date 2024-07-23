@@ -18,22 +18,22 @@
         </hardware>
         <joint name="leg_1_joint_1">
             <command_interface name="position">
-                <param name="min">-1</param>
-                <param name="max">1</param>
+                <param name="min">- ${pi / 3}</param>
+                <param name="max">${pi / 3}</param>
             </command_interface>
             <state_interface name="position"/>
         </joint>
         <joint name="leg_2_joint_1">
             <command_interface name="position">
-                <param name="min">-1</param>
-                <param name="max">1</param>
+                <param name="min">- ${pi / 3}</param>
+                <param name="max">${pi / 3}</param>
             </command_interface>
             <state_interface name="position"/>
         </joint>
         <joint name="leg_3_joint_1">
             <command_interface name="position">
-                <param name="min">-1</param>
-                <param name="max">1</param>
+                <param name="min">- ${pi / 3}</param>
+                <param name="max">${pi / 3}</param>
             </command_interface>
             <state_interface name="position"/>
         </joint>        

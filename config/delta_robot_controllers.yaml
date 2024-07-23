@@ -8,6 +8,9 @@ controller_manager:
     forward_position_controller:
       type: forward_command_controller/ForwardCommandController
 
+    position_controller:
+      type: position_controllers/JointPositionController
+
 forward_position_controller:
   ros__parameters:
     joints:
@@ -28,3 +31,28 @@ forward_position_controller:
         p: 100.0
         i: 0.01
         d: 10.0
+
+
+# position_controller:
+#   ros__parameters:
+#     joints:
+#       - leg_1_joint_1
+#       - leg_2_joint_1
+#       - leg_3_joint_1
+#     interface_name: position
+#     pid:
+#       leg_1_joint_1:
+#         p: 100.0
+#         i: 0.01
+#         d: 10.0
+#       leg_2_joint_1:
+#         p: 100.0
+#         i: 0.01
+#         d: 10.0
+#       leg_3_joint_1:
+#         p: 100.0
+#         i: 0.01
+#         d: 10.0
+
+  # Файл конфигурации описывает управления 3 вращательными шарнирами, имитируя работу дельтаробота. Давай напишем контроллер (на python) для управления данным механизмом на основе данных которые я тебе предоставил. Объясни как булет осуществляться управоение роботом
+

@@ -23,7 +23,7 @@
 <!-- *********************************************************************** -->
 
   <!-- Блок расчёта расположения и ориентации ног дельтаробота -->
-  <xacro:property name="base_offset_z" value="0.2"/>
+  <xacro:property name="base_offset_z" value="0"/>
   <xacro:property name="angle_deg_1" value="0"/>
   <xacro:property name="angle_deg_2" value="120"/>
   <xacro:property name="angle_deg_3" value="240"/>

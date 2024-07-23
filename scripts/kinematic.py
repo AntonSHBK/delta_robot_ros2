@@ -31,35 +31,45 @@ class DeltaRobot:
         """Решение обратной задачи кинематики для заданной позиции."""
         x, y, z = target_position
         theta = []
-
+        
         for i in range(3):
             base_point = self.base_points[i]
             platform_point = self.platform_points[i]
 
-            # Вычисление вектора от основания плеча к целевой точке
-            vector = np.array([x, y, z]) + platform_point - base_point
+            # Координаты целевой точки относительно базовой точки
+            x_prime = x + platform_point[0] - base_point[0]
+            y_prime = y + platform_point[1] - base_point[1]
+            z_prime = z
 
-            # Вычисление расстояния от основания плеча до целевой точки
-            d = np.linalg.norm(vector)
-            if d > (self.upper_arm_length + self.forearm_length):
+            # Вычисление горизонтального расстояния до целевой точки
+            horizontal_distance = np.sqrt(x_prime**2 + y_prime**2)
+
+            # Вычисление угла плеча
+            a = self.upper_arm_length
+            b = self.forearm_length
+            c = horizontal_distance
+
+            # Проверка достижимости целевой точки
+            if c > a + b:
                 raise ValueError("Целевая точка вне досягаемости")
 
-            # Проекция вектора на плоскость XY
-            projected_length = np.linalg.norm(vector[:2])
+            # Использование теоремы косинусов для вычисления угла в горизонтальной плоскости
+            cos_theta = (a**2 + c**2 - b**2) / (2 * a * c)
+            theta_horizontal = math.acos(cos_theta)
 
-            # Использование теоремы косинусов для вычисления угла
-            cos_theta = (self.upper_arm_length**2 + projected_length**2 - self.forearm_length**2) / (2 * self.upper_arm_length * projected_length)
-            if not (-1 <= cos_theta <= 1):
-                raise ValueError("Целевая точка вне досягаемости")
+            # Вычисление вертикального угла
+            d = np.sqrt(c**2 + z_prime**2)
+            cos_alpha = (a**2 + d**2 - b**2) / (2 * a * d)
+            alpha = math.acos(cos_alpha)
 
-            theta_i = math.acos(cos_theta)
-            theta.append(math.degrees(theta_i))
+            theta_i = theta_horizontal - alpha
+            theta.append(theta_i)
 
         return theta
-    
+
     def forward_kinematics(self, angles):
         """Решение прямой задачи кинематики для заданных углов приводов."""
-        theta_rad = [math.radians(angle) for angle in angles]
+        theta_rad = angles
         points = []
 
         for i in range(3):
@@ -92,13 +102,13 @@ class DeltaRobot:
 
 if __name__ == '__main__':
     # Пример использования
-    base_radius = 200
-    platform_radius = 50
-    upper_arm_length = 100
-    forearm_length = 100
+    base_radius = 500
+    platform_radius = 300
+    upper_arm_length = 400
+    forearm_length = 300
 
     delta_robot = DeltaRobot(base_radius, platform_radius, upper_arm_length, forearm_length)
-    target_position = [0, 10, -80]
+    target_position = [-10, 10, 550]
 
     # Обратная задача кинематики
     try:
@@ -106,8 +116,8 @@ if __name__ == '__main__':
         print(f"Углы приводов для достижения позиции {target_position}: {angles}")
     except ValueError as e:
         print(f"Ошибка: {e}")
-
+        
     # Прямая задача кинематики
-    angles = [45, 45, 45]
-    position = delta_robot.forward_kinematics(angles)
-    print(f"Позиция для углов приводов {angles}: {position}")
+    joint_angles = [0.1, 0.1, 0.1]  # Пример углов в радианах
+    position = delta_robot.forward_kinematics(joint_angles)
+    print(f"Позиция для углов приводов {joint_angles}: {position}")

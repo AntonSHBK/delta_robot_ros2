@@ -22,7 +22,7 @@ def generate_launch_description():
     pkg_share = get_package_share_directory(pkg_name)
     
     # Пространство имён
-    robot_namespace = 'delta_robot'   
+    # robot_namespace = 'delta_robot'   
     
     # Get URDF via xacro
     robot_description_content = Command(
@@ -74,15 +74,15 @@ def generate_launch_description():
     # Initialize Arguments
     gui = LaunchConfiguration("gui")
     
-     # gazebo
-    gazebo = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
-        )
-    )
+    #  # gazebo
+    # gazebo = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         [FindPackageShare("ros_gz_sim"), "/launch/gz_sim.launch.py"]
+    #     )
+    # )
     
     launch_description = [
-        gazebo
+        # gazebo
     ]
     
     # Nodes
@@ -90,75 +90,92 @@ def generate_launch_description():
         package='robot_state_publisher',
         executable='robot_state_publisher',
         name='robot_state_publisher',
-        namespace=robot_namespace,  # Добавление пространства имен
+        # namespace=robot_namespace,  # Добавление пространства имен
         output='both',
         parameters=[robot_description]
     )
     
     # joint_state_publisher также в пространстве имен
-    joint_state_publisher_node = Node(
-        package='joint_state_publisher',
-        executable='joint_state_publisher',
-        name='joint_state_publisher',
-        namespace=robot_namespace,  # Добавление пространства имен
-        output='both'
-    )
+    # joint_state_publisher_node = Node(
+    #     package='joint_state_publisher',
+    #     executable='joint_state_publisher',
+    #     name='joint_state_publisher',
+    #     # namespace=robot_namespace,  # Добавление пространства имен
+    #     output='both'
+    # )
 
     # Контроллеры
     ros2_control_node = Node(
         package='controller_manager',
         executable='ros2_control_node',
-        # name='ros2_control_node',
-        # namespace=robot_namespace,  # Добавление пространства имен
         output='both',
         parameters=[robot_controllers],
         remappings=[
-            ("~/robot_description", f"/{robot_namespace}/robot_description"),
+            ("~/robot_description", f"/robot_description"),
         ],
     )
     
     joint_state_broadcaster_node = Node(
         package='controller_manager',
         executable='spawner',
-        # name='joint_state_broadcaster_spawner',
-        # namespace=robot_namespace,  # Добавление пространства имен
         output='both',
         arguments=['joint_state_broadcaster', '--controller-manager', 
                     f'/controller_manager',
                     ],
     )
     
-    robot_controller_node = Node(
+    forward_position_controller_node = Node(
         package='controller_manager',
         executable='spawner',
-        # name='position_controllers_spawner',
-        # namespace=robot_namespace,  # Добавление пространства имен
         output='both',
         arguments=['forward_position_controller', '--controller-manager',  
                    f'/controller_manager',
                    ],
     )
+    
+    # position_controllers_node = Node(
+    #     package='controller_manager',
+    #     executable='spawner',
+    #     output='both',
+    #     arguments=['position_controller', '--controller-manager',  
+    #                f'/controller_manager',
+    #                ],
+    # )
+    
+    delta_robot_controller_node = Node(
+        package=pkg_name,
+        executable='delta_robot_controller.py',
+        name='delta_robot_controller',
+        output='screen'
+    )
+    
+    dinamic_tf_controller_node = Node(
+        package=pkg_name,
+        executable='dinamic_tf.py',
+        name='dinamic_tf',
+        output='screen'
+    )
 
-    # RViz запускается в том же пространстве имен
+
+    # RViz
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
         name='rviz2',
-        namespace=robot_namespace,  # Добавление пространства имен
         arguments=['-d', rviz_config_file],
         output='screen',
         condition=IfCondition(gui),
     )
     
-    gz_node = Node(
-        package="ros_gz_sim",
-        executable="create",
-        output="screen",
-        arguments=[
-            "-topic", f"/robot_description",
-            "-name", "delta_robot",
-        ],
-    )
+    # gz_node = Node(
+    #     package="ros_gz_sim",
+    #     executable="create",
+    #     output="screen",
+    #     arguments=[
+    #         "-topic", f"/robot_description",
+    #         "-name", "delta_robot",
+    #     ],
+    # )
     
     # Delay rviz start after `joint_state_broadcaster`
     delay_rviz_after_joint_state_broadcaster_node = RegisterEventHandler(
@@ -169,28 +186,37 @@ def generate_launch_description():
     )
 
     # Delay start of robot_controller after `joint_state_broadcaster`
-    delay_robot_controller_node_after_joint_state_broadcaster_node = RegisterEventHandler(
+    delay_forward_controller_node_after_joint_state_broadcaster_node = RegisterEventHandler(
         event_handler=OnProcessExit(
             target_action=joint_state_broadcaster_node,
-            on_exit=[robot_controller_node],
-        )
-    )
-
-    delay_gz_node_after_joint_state_broadcaster_node = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=joint_state_broadcaster_node,
-            on_exit=[gz_node],
+            on_exit=[forward_position_controller_node],
         )
     )
     
+    # delay_position_controller_node_after_joint_state_broadcaster_node = RegisterEventHandler(
+    #     event_handler=OnProcessExit(
+    #         target_action=joint_state_broadcaster_node,
+    #         on_exit=[position_controllers_node],
+    #     )
+    # )
+
+    # delay_gz_node_after_joint_state_broadcaster_node = RegisterEventHandler(
+    #     event_handler=OnProcessExit(
+    #         target_action=joint_state_broadcaster_node,
+    #         on_exit=[gz_node],
+    #     )
+    # )
+    
     nodes = [
         robot_state_publisher_node,
-        # joint_state_publisher_node,
         ros2_control_node,
+        delta_robot_controller_node,
+        dinamic_tf_controller_node,
         joint_state_broadcaster_node,
         delay_rviz_after_joint_state_broadcaster_node,
-        delay_robot_controller_node_after_joint_state_broadcaster_node,
-        delay_gz_node_after_joint_state_broadcaster_node
+        delay_forward_controller_node_after_joint_state_broadcaster_node,
+        # delay_position_controller_node_after_joint_state_broadcaster_node,
+        # delay_gz_node_after_joint_state_broadcaster_node
     ]   
 
     return LaunchDescription(declared_arguments + launch_description + nodes)

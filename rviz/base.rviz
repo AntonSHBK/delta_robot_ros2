@@ -60,7 +60,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /delta_robot/robot_description
+        Value: /robot_description
       Enabled: true
       Links:
         All Links Enabled: true
@@ -201,10 +201,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.29979661107063293
+      Pitch: 0.05979663133621216
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.9854023456573486
+      Yaw: 4.765402317047119
     Saved: ~
 Window Geometry:
   Displays:

@@ -1,74 +1,64 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import rospy
-from std_msgs.msg import Float64
-from geometry_msgs.msg import Pose, TransformStamped
-import tf
-import tf2_ros
+import math
 import numpy as np
+
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import Float64MultiArray
+from geometry_msgs.msg import Point
 
 from kinematic import DeltaRobot
 
-class DeltaRobotController:
+class DeltaRobotController(Node):
     def __init__(self):
-        rospy.init_node('delta_robot_controller')
-
-        # Подписка на топик с командами
-        self.command_sub = rospy.Subscriber('/delta_robot/command', Pose, self.command_callback)
+        super().__init__('delta_robot_controller')
         
-        # Публикация углов для ног
-        self.leg1_joint1_pub = rospy.Publisher('/delta_robot/leg_1_joint_1_controller/command', 
-        Float64, queue_size=10)
-        self.leg2_joint1_pub = rospy.Publisher('/delta_robot/leg_2_joint_1_controller/command', Float64, queue_size=10)
-        self.leg3_joint1_pub = rospy.Publisher('/delta_robot/leg_3_joint_1_controller/command', Float64, queue_size=10)
-
-        self.br = tf2_ros.TransformBroadcaster()
-
-        base_radius = 500
-        platform_radius = 100
-        upper_arm_length = 400
-        forearm_length = 300
-
-        self.delta_robot = DeltaRobot(base_radius, platform_radius, 
-                                      upper_arm_length, forearm_length)
-
-    def command_callback(self, msg):
-        # Обработка входной команды и расчет углов для ног
-        target_position = np.array([msg.position.x, msg.position.y, msg.position.z])
-
-        # Здесь будет расчет обратной кинематики
-
-        leg_angles = self.delta_robot.inverse_kinematics(target_position)
-
-        # Публикация углов для ног
-        self.leg1_joint1_pub.publish(Float64(leg_angles[0]))
-        self.leg2_joint1_pub.publish(Float64(leg_angles[1]))
-        self.leg3_joint1_pub.publish(Float64(leg_angles[2]))
-
-        # Публикация текущей трансформации для визуализации
-        self.publish_transform('base_link', 'platform', target_position)
-
-    def publish_transform(self, parent_frame, child_frame, translation):
-        t = TransformStamped()
-
-        t.header.stamp = rospy.Time.now()
-        t.header.frame_id = parent_frame
-        t.child_frame_id = child_frame
-
-        t.transform.translation.x = translation[0]
-        t.transform.translation.y = translation[1]
-        t.transform.translation.z = translation[2]
+        # Создаем экземпляр DeltaRobot с вашими параметрами
+        self.robot = DeltaRobot(
+            base_radius=500, 
+            platform_radius=300, 
+            upper_arm_length=400, 
+            forearm_length=300
+            )
         
-        t.transform.rotation.x = 0.0
-        t.transform.rotation.y = 0.0
-        t.transform.rotation.z = 0.0
-        t.transform.rotation.w = 1.0
+        # Подписка на топик с целевыми координатами
+        self.subscription = self.create_subscription(
+            Point,
+            'target_position',
+            self.target_position_callback,
+            100
+        )
         
-        self.br.sendTransform(t)
+        # Издатель для отправки команд контроллеру
+        self.publisher = self.create_publisher(
+            Float64MultiArray,
+            '/forward_position_controller/commands',
+            100
+        )
+        
+        self.get_logger().info('Delta Robot Controller has been started.')
+    
+    def target_position_callback(self, msg):
+        target_position = [msg.x, msg.y, msg.z]
+        try:
+            joint_angles = self.robot.inverse_kinematics(target_position)
+            self.publish_joint_commands(joint_angles)
+        except ValueError as e:
+            self.get_logger().error(f'Error in inverse kinematics: {e}')
+    
+    def publish_joint_commands(self, joint_angles):
+        command_msg = Float64MultiArray()
+        command_msg.data = joint_angles
+        self.publisher.publish(command_msg)
+        self.get_logger().info(f'Published joint commands: {joint_angles}')
 
-    def spin(self):
-        rospy.spin()
+def main(args=None):
+    rclpy.init(args=args)
+    node = DeltaRobotController()
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
 
 if __name__ == '__main__':
-    controller = DeltaRobotController()
-    controller.spin()
+    main()
