@@ -1,6 +1,8 @@
 import math
 import numpy as np
 
+from scipy.optimize import fsolve
+
 class DeltaRobot:
     def __init__(self, base_radius, platform_radius, upper_arm_length, forearm_length):
         self.base_radius = base_radius
@@ -67,37 +69,11 @@ class DeltaRobot:
 
         return theta
 
-    def forward_kinematics(self, angles):
-        """Решение прямой задачи кинематики для заданных углов приводов."""
-        theta_rad = angles
-        points = []
+    def forward_kinematics(self, joint_angles):
+        """Решение прямой задачи кинематики для заданных углов."""
+        
 
-        for i in range(3):
-            base_point = self.base_points[i]
-            angle = theta_rad[i]
-            
-            # Вычисление положения конца плеча в пространстве
-            x = base_point[0] + self.upper_arm_length * math.cos(angle)
-            y = base_point[1] + self.upper_arm_length * math.sin(angle)
-            z = 0
-            points.append(np.array([x, y, z]))
-
-        # Решение системы уравнений для нахождения пересечения трех сфер
-        def equations(vars):
-            x, y, z = vars
-            eqs = []
-            for i in range(3):
-                arm_end = points[i]
-                platform_point = self.platform_points[i]
-                eq = (x - arm_end[0])**2 + (y - arm_end[1])**2 + (z - arm_end[2])**2 - self.forearm_length**2
-                eqs.append(eq)
-            return eqs
-
-        from scipy.optimize import fsolve
-        initial_guess = [0, 0, -self.forearm_length]
-        solution = fsolve(equations, initial_guess)
-
-        return solution
+        return []
 
 
 if __name__ == '__main__':
@@ -108,7 +84,7 @@ if __name__ == '__main__':
     forearm_length = 300
 
     delta_robot = DeltaRobot(base_radius, platform_radius, upper_arm_length, forearm_length)
-    target_position = [-10, 10, 550]
+    target_position = [0, 0, 600]
 
     # Обратная задача кинематики
     try:
@@ -118,6 +94,6 @@ if __name__ == '__main__':
         print(f"Ошибка: {e}")
         
     # Прямая задача кинематики
-    joint_angles = [0.1, 0.1, 0.1]  # Пример углов в радианах
+    joint_angles = [1., 1., 1.]  # Пример углов в радианах
     position = delta_robot.forward_kinematics(joint_angles)
     print(f"Позиция для углов приводов {joint_angles}: {position}")

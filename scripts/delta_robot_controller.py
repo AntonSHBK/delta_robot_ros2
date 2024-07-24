@@ -27,14 +27,14 @@ class DeltaRobotController(Node):
             Point,
             'target_position',
             self.target_position_callback,
-            100
+            1000
         )
         
         # Издатель для отправки команд контроллеру
         self.publisher = self.create_publisher(
             Float64MultiArray,
             '/forward_position_controller/commands',
-            100
+            1000
         )
         
         self.get_logger().info('Delta Robot Controller has been started.')

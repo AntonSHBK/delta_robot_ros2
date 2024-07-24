@@ -155,6 +155,13 @@ def generate_launch_description():
         name='dinamic_tf',
         output='screen'
     )
+    
+    delta_robot_controller_gui_node = Node(
+        package=pkg_name,
+        executable='user_gui.py',
+        name='delta_robot_controller_gui',
+        output='screen'
+    )
 
 
     # RViz
@@ -212,6 +219,7 @@ def generate_launch_description():
         ros2_control_node,
         delta_robot_controller_node,
         dinamic_tf_controller_node,
+        delta_robot_controller_gui_node,
         joint_state_broadcaster_node,
         delay_rviz_after_joint_state_broadcaster_node,
         delay_forward_controller_node_after_joint_state_broadcaster_node,
